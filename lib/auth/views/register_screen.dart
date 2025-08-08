@@ -1,18 +1,19 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:ecommerce_app/Homepage/Home_screen.dart';
+import 'package:ecommerce_app/auth/Custom%20widget/auth_services.dart';
+import 'package:ecommerce_app/auth/Custom%20widget/custom_awesdia.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../widgets/Custom_TextField.dart';
-import '../widgets/social_Icon.dart';
+import '../Custom widget/Custom_TextField.dart';
+import '../Custom widget/social_Icon.dart';
 
-// ignore: must_be_immutable
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController conpassword = TextEditingController();
-  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +30,6 @@ class RegisterScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // Username Field
               CustomTextField(
                 mycontroller: email,
                 hintText: 'Username or Email',
@@ -37,7 +37,6 @@ class RegisterScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Password Field
               CustomTextField(
                 mycontroller: password,
                 hintText: 'Password',
@@ -46,7 +45,6 @@ class RegisterScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Confirm Password Field
               CustomTextField(
                 mycontroller: conpassword,
                 hintText: 'Confirm Password',
@@ -63,7 +61,6 @@ class RegisterScreen extends StatelessWidget {
                     color: Color.fromARGB(255, 111, 111, 112),
                   ),
                   text: "By clicking the ",
-
                   children: [
                     TextSpan(
                       style: GoogleFonts.montserrat(
@@ -92,8 +89,10 @@ class RegisterScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (password.text != conpassword.text) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Passwords do not match")),
+                      CustomDialog.showDialogMessage(
+                        context: context,
+                        message: "Passwords do not match",
+                        type: DialogType.error,
                       );
                       return;
                     }
@@ -104,33 +103,19 @@ class RegisterScreen extends StatelessWidget {
                           password: password.text,
                         )
                         .then((onValue) async {
-                          AwesomeDialog(
+                          CustomDialog.showDialogMessage(
                             context: context,
-                            dialogType: DialogType.success,
-                            animType: AnimType.rightSlide,
-                            title: 'Registration Successful', 
-                            btnCancelOnPress: () {},
-                            btnOkOnPress: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) => HomeScreen()),
-                              );
-                            },
-                          ).show();
+                            message: 'Registration Successful',
+                            type: DialogType.success,);
                         })
                         .catchError((error) {
-                          AwesomeDialog(
+                          CustomDialog.showDialogMessage(
                             context: context,
-                            dialogType: DialogType.error,
-                            animType: AnimType.rightSlide,
-                            title: 'Registration Failed',
-
-                            btnCancelOnPress: () {},
-                            btnOkOnPress: () {},
-                          ).show();
+                            message: "Registration Failed\n${error.toString()}",
+                            type: DialogType.error,
+                          );
                         });
                   },
-
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xffF83758),
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -159,12 +144,71 @@ class RegisterScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  SocialIcon(imagePath: 'assets/socialmedia/google.png'),
-                  SizedBox(width: 16),
-                  SocialIcon(imagePath: 'assets/socialmedia/apple.png'),
-                  SizedBox(width: 16),
-                  SocialIcon(imagePath: 'assets/socialmedia/facebook.png'),
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      try {
+                        await AuthServices.signInWithGoogle();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomeScreen()),
+                        );
+                      } catch (error) {
+                        CustomDialog.showDialogMessage(
+                          context: context,
+                          message: "Google Sign-In Failed\n${error.toString()}",
+                          type: DialogType.error,
+                        );
+                      }
+                    },
+                    child: SocialIcon(
+                      imagePath: 'assets/socialmedia/google.png',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: () async {
+                      try {
+                        await AuthServices.signInWithFacebook();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomeScreen()),
+                        );
+                      } catch (error) {
+                        CustomDialog.showDialogMessage(
+                          context: context,
+                          message:
+                              "Facebook Sign-In Failed\n${error.toString()}",
+                          type: DialogType.error,
+                        );
+                      }
+                    },
+                    child: SocialIcon(
+                      imagePath: 'assets/socialmedia/facebook.png',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                 /* GestureDetector(
+                    onTap: () async {
+                      try {
+                        await AuthServices.signInWithTwitter();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomeScreen()),
+                        );
+                      } catch (error) {
+                        CustomDialog.showDialogMessage(
+                          context: context,
+                          message:
+                              "Twitter Sign-In Failed\n${error.toString()}",
+                          type: DialogType.error,
+                        );
+                      }
+                    },
+                    child: SocialIcon(
+                      imagePath: 'assets/socialmedia/twitter.png',
+                    ),
+                  ),*/
                 ],
               ),
               const SizedBox(height: 30),
@@ -174,7 +218,6 @@ class RegisterScreen extends StatelessWidget {
                   const Text("I Already Have an Account "),
                   GestureDetector(
                     onTap: () {},
-
                     child: Text(
                       "Login",
                       style: GoogleFonts.montserrat(

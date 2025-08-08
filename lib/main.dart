@@ -1,5 +1,4 @@
 import 'package:ecommerce_app/auth/views/splash_screen.dart';
-import 'package:ecommerce_app/page_view_screens/pageview_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,26 +12,25 @@ void main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-@override
+  @override
   void initState() {
-    FirebaseAuth.instance
-  .authStateChanges()
-  .listen((User? user) {
-    if (user == null) {
-      print('================================== User is currently signed out!');
-    } else {
-      print('========================= User is signed in!');
-    }
-  });
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        print(
+          '================================== User is currently signed out!',
+        );
+      } else {
+        print('========================= User is signed in!');
+      }
+    });
     super.initState();
-
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
